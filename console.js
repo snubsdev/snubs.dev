@@ -103,9 +103,9 @@ $(window).resize((function() {
 }));
 
 $(window).ready((async function() {
-    for (line_no = 6, console_elem = document.getElementById("console"), printing = !0, await newLine(), putChar("user@j0w03l.me:~$ "), await sleep(1e3), char_delay = 25, i = 0; i < 7; i++) await putChar("ls -goh".charAt(i)), char_delay = Math.floor(30 * Math.random() + 25);
-    for (char_delay = ORIG_DELAY, await sleep(150), await newLine(), await sleep(350), await printMsg(0), await newLine(), putChar("user@j0w03l.me:~$ "), char_delay = 25, await sleep(650), i = 0; i < 16; i++) await putChar(CMD_TEXT_2.charAt(i)), char_delay = Math.floor(30 * Math.random() + 25);
-    char_delay = ORIG_DELAY, await sleep(150), await newLine(), await sleep(350), await printMsg(1), await newLine(), putChar("user@j0w03l.me:~$ "), printing = !1;
+    for (line_no = 6, console_elem = document.getElementById("console"), printing = !0, await newLine(), putChar("web@snubs.dev:~$ "), await sleep(1e3), char_delay = 25, i = 0; i < 7; i++) await putChar("ls -goh".charAt(i)), char_delay = Math.floor(30 * Math.random() + 25);
+    for (char_delay = ORIG_DELAY, await sleep(150), await newLine(), await sleep(350), await printMsg(0), await newLine(), putChar("web@snubs.dev:~$ "), char_delay = 25, await sleep(650), i = 0; i < 16; i++) await putChar(CMD_TEXT_2.charAt(i)), char_delay = Math.floor(30 * Math.random() + 25);
+    char_delay = ORIG_DELAY, await sleep(150), await newLine(), await sleep(350), await printMsg(1), await newLine(), putChar("web@snubs.dev:~$ "), printing = !1;
 }));
 
 $(document).ready((async function() {
@@ -130,7 +130,7 @@ var tty = function() {
                     default:
                         await newLine(), await printMsg(-1);
                 }
-                await newLine(), putChar("user@j0w03l.me:~$ "), history.replaceState(null, "/", ""), cur_line_elem.scrollIntoView();
+                await newLine(), putChar("web@snubs.dev:~$ "), history.replaceState(null, "/", ""), cur_line_elem.scrollIntoView();
             }
         }
     };

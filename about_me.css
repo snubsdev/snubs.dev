@@ -1,0 +1,1 @@
+.console{display:flex;flex-direction:column}@keyframes console-line-cursor-blink{0{color:#000}49%{color:#000}50%{color:#fff}100%{color:#fff}}.console-line-cursor:after{content:"\2588";animation-name:"console-line-cursor-blink";animation-duration:500ms;animation-timing-function:steps(start,end);animation-iteration-count:infinite}

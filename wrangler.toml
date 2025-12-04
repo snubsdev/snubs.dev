@@ -1,0 +1,13 @@
+name = "image-transform-app"
+main = "src/worker/index.ts"
+compatibility_date = "2024-01-01"
+
+[[r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "image-transform-temp"
+
+[triggers]
+crons = ["0 */1 * * *"]  # Every hour
+
+[build]
+command = "npm run build"

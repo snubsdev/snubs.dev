@@ -1,10 +1,10 @@
-name = "image-transform-app"
+name = "snubs-dev"
 main = "src/worker/index.ts"
 compatibility_date = "2024-01-01"
 
 [[r2_buckets]]
 binding = "IMAGES_BUCKET"
-bucket_name = "image-transform-temp"
+bucket_name = "imagen"
 
 [triggers]
 crons = ["0 */1 * * *"]  # Every hour

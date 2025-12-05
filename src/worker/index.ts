@@ -1,9 +1,22 @@
+import { R2Bucket, ScheduledEvent, ExecutionContext } from '@cloudflare/workers-types';
+
 export interface Env {
   IMAGES_BUCKET: R2Bucket;
 }
 
 const worker = {
   async fetch(request: Request, env: Env): Promise<Response> {
+    // Handle CORS preflight
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      });
+    }
+
     if (request.method === 'POST') {
       return handleUpload(request, env);
     }
@@ -26,16 +39,20 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
   }
 
   const key = `${Date.now()}-${file.name}`;
-  await env.IMAGES_BUCKET.put(key, file, {
+  const arrayBuffer = await file.arrayBuffer();
+  await env.IMAGES_BUCKET.put(key, arrayBuffer, {
     customMetadata: {
       uploadedAt: new Date().toISOString(),
     },
   });
 
-  const url = `https://<your-domain>.r2.cloudflarestorage.com/${key}`; // Replace with actual domain
+  const url = `https://r2.snubs.dev/${key}`; // Replace with actual domain
 
   return new Response(JSON.stringify({ url, key }), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    },
   });
 }
 

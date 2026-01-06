@@ -1,0 +1,13 @@
+{
+  "name": "snubs-dev-worker",
+  "version": "1.0.0",
+  "description": "Simple URL shortener Cloudflare Worker",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.54.0"
+  }
+}

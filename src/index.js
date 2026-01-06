@@ -66,7 +66,7 @@ export default {
         await env.URLS.put(shortCode, originalUrl);
 
         // Return the short URL
-        const shortUrl = `${url.origin}/${shortCode}`;
+        const shortUrl = `https://snubs.dev/${shortCode}`;
         return new Response(JSON.stringify({ shortUrl }), {
           headers: { 'Content-Type': 'application/json' }
         });

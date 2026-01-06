@@ -152,8 +152,8 @@ export default {
       text-align: center;
       margin-bottom: 10px;
       font-size: 2.2rem;
-      font-weight: 400;
-      font-family: 'Stella Nova', serif;
+      font-weight: 300;
+      font-family: 'Orkney';
     }
     .subtitle {
       text-align: center;
@@ -168,7 +168,7 @@ export default {
       margin-top: 40px;
       margin-bottom: 20px;
       font-size: 1.5rem;
-      font-family: 'Stella Nova', serif;
+      font-family: 'Orkney', serif;
       font-weight: 700;
     }
     ul {

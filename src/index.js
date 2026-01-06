@@ -117,25 +117,107 @@ export default {
     } else if (request.method === 'GET' && url.pathname === '/') {
       const html = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.semaphoreapi.com/css2?family=Orkney:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700">
   <title>Snubs.dev URL Shortener</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; background: #121212; color: #fff; }
-    h1 { color: #fff; }
-    code { background: #333; padding: 2px 4px; border-radius: 3px; color: #fff; }
-    ul { color: #ccc; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Orkney';
+      background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
+      color: #e0e0e0;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      max-width: 600px;
+      width: 90%;
+      margin: 20px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    h1 {
+      color: #fff;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2.2rem;
+      font-weight: 400;
+      font-family: 'Stella Nova', serif;
+    }
+    .subtitle {
+      text-align: center;
+      color: #bbb;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+    h2 {
+      color: #fff;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      font-family: 'Stella Nova', serif;
+      font-weight: 700;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: rgba(255, 255, 255, 0.05);
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #666;
+    }
+    li:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-left-color: #999;
+    }
+    strong {
+      color: #fff;
+    }
+    code {
+      background: #333;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+        margin: 10px;
+      }
+      h1 { font-size: 1.8rem; }
+      h2 { font-size: 1.3rem; }
+      li { padding: 12px; }
+    }
   </style>
 </head>
 <body>
-  <h1>Snubs.dev URL Shortener</h1>
-  <p>A private URL shortener service.</p>
-  <h2>Public Endpoints</h2>
-  <ul>
-    <li><strong>GET /&lt;shortcode&gt;</strong> - Redirect to original URL</li>
-    <li><strong>GET /health</strong> - Health check</li>
-    <li><strong>GET /stats</strong> - View all short links</li>
-  </ul>
+  <div class="container">
+    <h1>Snubs.dev</h1>
+    <p class="subtitle">A private URL shortener service</p>
+    <h2>Public Endpoints</h2>
+    <ul>
+      <li><strong>GET /&lt;shortcode&gt;</strong> - Redirect to original URL</li>
+      <li><strong>GET /health</strong> - Service health check</li>
+      <li><strong>GET /stats</strong> - View all short links</li>
+    </ul>
+  </div>
 </body>
 </html>
       `;

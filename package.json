@@ -1,5 +1,5 @@
 {
-  "name": "snubs-dev-worker",
+  "name": "fluffy-links",
   "version": "1.0.0",
   "description": "Simple URL shortener Cloudflare Worker",
   "main": "src/index.js",

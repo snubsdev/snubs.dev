@@ -1,6 +1,6 @@
-name = "snubs-dev-worker"
+name = "fluffy-links"
 main = "src/index.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-11-17"
 
 [[kv_namespaces]]
 binding = "URLS"

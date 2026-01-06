@@ -28,11 +28,23 @@ function randomMessage(arr) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const hostname = url.hostname;
 
-    if (request.method === 'POST' && url.pathname === '/l/c') {
+    if (hostname === 'api.snubs.dev') {
+      // API domain - only allow management operations
+      if (url.pathname === '/l/c' && request.method !== 'POST') {
+        return new Response(JSON.stringify({ error: 'Method Not Allowed', message: 'Only POST requests are allowed for this endpoint' }), {
+          status: 405,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      if (request.method === 'POST' && url.pathname === '/l/c') {
       // Handle create short URL
       if (request.headers.get('X-Fluffy') !== 'true') {
-        return new Response(randomMessage(funny401), { status: 401 });
+        return new Response(JSON.stringify({ error: 'Unauthorized', message: randomMessage(funny401) }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
 
       try {
@@ -41,7 +53,10 @@ export default {
         const customSlug = body.slug;
 
         if (!originalUrl) {
-          return new Response(randomMessage(funny400), { status: 400 });
+          return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          });
         }
 
         // Use custom slug or generate random
@@ -57,18 +72,27 @@ export default {
         });
 
       } catch (error) {
-        return new Response(randomMessage(funny400), { status: 400 });
+        return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
 
     } else if (request.method === 'PUT' && url.pathname.startsWith('/l/')) {
       // Handle update short URL
       if (request.headers.get('X-Fluffy') !== 'true') {
-        return new Response(randomMessage(funny401), { status: 401 });
+        return new Response(JSON.stringify({ error: 'Unauthorized', message: randomMessage(funny401) }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
 
       const slug = url.pathname.split('/l/')[1];
       if (!slug) {
-        return new Response(randomMessage(funny400), { status: 400 });
+        return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
 
       try {
@@ -76,13 +100,19 @@ export default {
         const newUrl = body.url;
 
         if (!newUrl) {
-          return new Response(randomMessage(funny400), { status: 400 });
+          return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          });
         }
 
         // Check if exists
         const existing = await env.URLS.get(slug);
         if (!existing) {
-          return new Response(randomMessage(funny404), { status: 404 });
+          return new Response(JSON.stringify({ error: 'Not Found', message: randomMessage(funny404) }), {
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          });
         }
 
         // Update
@@ -92,29 +122,77 @@ export default {
         });
 
       } catch (error) {
-        return new Response(randomMessage(funny400), { status: 400 });
+        return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
 
     } else if (request.method === 'DELETE' && url.pathname.startsWith('/l/')) {
       // Handle delete short URL
       if (request.headers.get('X-Fluffy') !== 'true') {
-        return new Response(randomMessage(funny401), { status: 401 });
+        return new Response(JSON.stringify({ error: 'Unauthorized', message: randomMessage(funny401) }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
 
       const slug = url.pathname.split('/l/')[1];
       if (!slug) {
-        return new Response(randomMessage(funny400), { status: 400 });
+        return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
 
       const existing = await env.URLS.get(slug);
       if (!existing) {
-        return new Response(randomMessage(funny404), { status: 404 });
+        return new Response(JSON.stringify({ error: 'Not Found', message: randomMessage(funny404) }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
 
       await env.URLS.delete(slug);
       return new Response('Deleted', { status: 200 });
 
+    } else if (request.method === 'GET' && url.pathname === '/health') {
+      const keys = await env.URLS.list();
+      const urlCount = keys.keys.length;
+      const health = {
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        urlCount: urlCount
+      };
+      return new Response(JSON.stringify(health), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+    } else if (request.method === 'GET' && url.pathname === '/stats') {
+      const keys = await env.URLS.list();
+      const stats = {};
+      for (const key of keys.keys) {
+        const originalUrl = await env.URLS.get(key.name);
+        stats[key.name] = originalUrl;
+      }
+      return new Response(JSON.stringify(stats), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+
     } else if (request.method === 'GET' && url.pathname === '/') {
+      return new Response(JSON.stringify({ message: 'Deployment is running' }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+    } else {
+      return new Response(JSON.stringify({ error: 'Not Found', message: randomMessage(funny404) }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    } else if (hostname === 'snubs.dev' || hostname === 'fluffy-links.sdsv.workers.dev') {
+      // Public domain - redirects and homepage
+      if (request.method === 'GET' && url.pathname === '/') {
       const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -122,7 +200,14 @@ export default {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://fonts.semaphoreapi.com/css2?family=Orkney:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700">
-  <title>Snubs.dev URL Shortener</title>
+  <meta property="og:title" content="Fluffy Links">
+  <meta property="og:description" content="A private URL shortener service">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://snubs.dev">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Fluffy Links">
+  <meta name="twitter:description" content="A private URL shortener service">
+  <title>Fluffy Links</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -131,10 +216,9 @@ export default {
       color: #e0e0e0;
       margin: 0;
       padding: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
     }
     .container {
       max-width: 600px;
@@ -146,6 +230,10 @@ export default {
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
     h1 {
       color: #fff;
@@ -161,40 +249,8 @@ export default {
       margin-bottom: 30px;
       font-size: 1.1rem;
     }
-    h2 {
-      color: #fff;
-      border-bottom: 2px solid #333;
-      padding-bottom: 10px;
-      margin-top: 40px;
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-      font-family: 'Orkney', serif;
-      font-weight: 700;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      background: rgba(255, 255, 255, 0.05);
-      margin: 10px 0;
-      padding: 15px;
-      border-radius: 8px;
-      border-left: 4px solid #666;
-    }
-    li:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-left-color: #999;
-    }
     strong {
       color: #fff;
-    }
-    code {
-      background: #333;
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: #fff;
-      font-family: 'Courier New', monospace;
     }
     @media (max-width: 480px) {
       .container {
@@ -209,34 +265,14 @@ export default {
 </head>
 <body>
   <div class="container">
-    <h1>Snubs.dev</h1>
+    <h1>Fluffy Links</h1>
     <p class="subtitle">A private URL shortener service</p>
-    <h2>Public Endpoints</h2>
-    <ul>
-      <li><strong>GET /&lt;shortcode&gt;</strong> - Redirect to original URL</li>
-      <li><strong>GET /health</strong> - Service health check</li>
-      <li><strong>GET /stats</strong> - View all short links</li>
-    </ul>
   </div>
 </body>
 </html>
       `;
       return new Response(html, {
         headers: { 'Content-Type': 'text/html' }
-      });
-
-    } else if (request.method === 'GET' && url.pathname === '/health') {
-      return new Response('OK', { status: 200 });
-
-    } else if (request.method === 'GET' && url.pathname === '/stats') {
-      const keys = await env.URLS.list();
-      const stats = {};
-      for (const key of keys.keys) {
-        const originalUrl = await env.URLS.get(key.name);
-        stats[key.name] = originalUrl;
-      }
-      return new Response(JSON.stringify(stats), {
-        headers: { 'Content-Type': 'application/json' }
       });
 
     } else if (request.method === 'GET' && url.pathname.length > 1 && !url.pathname.startsWith('/l/')) {
@@ -252,6 +288,9 @@ export default {
 
     } else {
       return new Response(randomMessage(funny404), { status: 404 });
+    }
+    } else {
+      return new Response('Domain not supported', { status: 404 });
     }
   }
 };

@@ -239,7 +239,7 @@ export default {
       text-align: center;
       margin-bottom: 10px;
       font-size: 2.2rem;
-      font-weight: 300;
+      font-weight: 700;
       font-family: 'Orkney';
     }
     .subtitle {

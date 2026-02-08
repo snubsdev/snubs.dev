@@ -198,7 +198,7 @@ export default {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://fonts.semaphoreapi.com/css2?family=Geist:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap">
   <meta property="og:title" content="Fluffy Links">
   <meta property="og:description" content="A private URL shortener service">
   <meta property="og:type" content="website">

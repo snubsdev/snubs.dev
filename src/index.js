@@ -8,10 +8,9 @@ const funny404 = [
 ];
 
 const funny401 = [
-  "Unauthorized! Fluffy access only.",
-  "X-Fluffy header missing. Are you fluffy enough?",
+  "Unauthorized! special access only.",
   "Access denied. Only fluffy creatures allowed.",
-  "401: Not fluffy. Try again with more fluff."
+  "401: Not fluffy."
 ];
 
 const funny400 = [
@@ -41,7 +40,7 @@ export default {
       if (request.method === 'POST' && url.pathname === '/l/c') {
       // Handle create short URL
       if (request.headers.get('X-Fluffy') !== 'true') {
-        return new Response(JSON.stringify({ error: 'Unauthorized', message: randomMessage(funny401) }), {
+        return new Response(JSON.stringify({ error: 'Not fluffy enough', message: randomMessage(funny401) }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' }
         });
@@ -180,7 +179,7 @@ export default {
       });
 
     } else if (request.method === 'GET' && url.pathname === '/') {
-      return new Response(JSON.stringify({ message: 'Deployment is running' }), {
+      return new Response(JSON.stringify({ message: 'Deployment is running', code: 200 }), {
         headers: { 'Content-Type': 'application/json' }
       });
 
@@ -190,7 +189,7 @@ export default {
         headers: { 'Content-Type': 'application/json' }
       });
     }
-    } else if (hostname === 'snubs.dev' || hostname === 'fluffy-links.sdsv.workers.dev') {
+    } else if (hostname === 'snubs.dev' || hostname === 'fluffy-links.sdsv.workers.dev' || hostname === "scarlets.group") {
       // Public domain - redirects and homepage
       if (request.method === 'GET' && url.pathname === '/') {
       const html = `
@@ -199,11 +198,11 @@ export default {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://fonts.semaphoreapi.com/css2?family=Orkney:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700">
+  <link rel="stylesheet" href="https://fonts.semaphoreapi.com/css2?family=Geist:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700">
   <meta property="og:title" content="Fluffy Links">
   <meta property="og:description" content="A private URL shortener service">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://snubs.dev">
+  <meta property="og:url" content="https://${hostname}">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Fluffy Links">
   <meta name="twitter:description" content="A private URL shortener service">
@@ -211,7 +210,7 @@ export default {
   <style>
     * { box-sizing: border-box; }
     body {
-      font-family: 'Orkney';
+      font-family: 'Geist';
       background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
       color: #e0e0e0;
       margin: 0;

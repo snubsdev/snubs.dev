@@ -189,7 +189,7 @@ export default {
         headers: { 'Content-Type': 'application/json' }
       });
     }
-    } else if (hostname === 'snubs.dev' || hostname === 'fluffy-links.sdsv.workers.dev' || hostname === "scarlets.group") {
+    } else if (hostname === 'snubs.dev' || hostname === 'fluffy-links.sdsv.workers.dev' || hostname === "scarlets.group" || hostname === "go-to.wtf") {
       // Public domain - redirects and homepage
       if (request.method === 'GET' && url.pathname === '/') {
       const html = `

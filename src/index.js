@@ -161,7 +161,9 @@ export default {
       const health = {
         status: 'OK',
         timestamp: new Date().toISOString(),
-        urlCount: urlCount
+        urlCount: urlCount,
+        versionId: env.VERSION_METADATA.versionId,
+        versionTag: env.VERSION_METADATA.versionTag
       };
       return new Response(JSON.stringify(health), {
         headers: { 'Content-Type': 'application/json' }

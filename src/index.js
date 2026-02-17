@@ -187,7 +187,7 @@ export default {
       });
 
     } else if (request.method === 'GET' && url.pathname === '/') {
-      return new Response(JSON.stringify({ message: 'Deployment is running', code: 200, versionId: versionId, versionTimestamp: versionTimestamp }), {
+      return new Response(JSON.stringify({ message: 'Deployment is running', code: 200, "Deployment ID": versionId, "Deployed At": versionTimestamp }), {
         headers: { 'Content-Type': 'application/json' }
       });
 

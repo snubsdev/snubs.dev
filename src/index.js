@@ -26,6 +26,7 @@ function randomMessage(arr) {
 
 export default {
   async fetch(request, env) {
+    const { id: versionId, tag: versionTag, timestamp: versionTimestamp } = env.CF_VERSION_METADATA;
     const url = new URL(request.url);
     const hostname = url.hostname;
 
@@ -162,6 +163,7 @@ export default {
         status: 'OK',
         timestamp: new Date().toISOString(),
         urlCount: urlCount,
+        versionId: versionId,
         versionTag: versionTag,
         versionTimestamp: versionTimestamp
       };

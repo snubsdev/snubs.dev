@@ -162,7 +162,6 @@ export default {
         status: 'OK',
         timestamp: new Date().toISOString(),
         urlCount: urlCount,
-        versionId: versionId,
         versionTag: versionTag,
         versionTimestamp: versionTimestamp
       };

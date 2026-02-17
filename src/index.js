@@ -182,7 +182,7 @@ export default {
         const originalUrl = await env.URLS.get(key.name);
         stats[key.name] = originalUrl;
       }
-      return new Response(JSON.stringify(stats, {"deployment_id": versionId, "deployed_at": versionTimestamp}), {
+      return new Response(JSON.stringify({"deployment_id": versionId, "deployed_at": versionTimestamp, "links": [stats]}), {
         headers: { 'Content-Type': 'application/json' }
       });
 

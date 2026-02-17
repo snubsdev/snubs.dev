@@ -1,27 +1,33 @@
-const funny404 = [
-  "This link has vanished into the void!",
-  "404: Link not found. Maybe it's hiding?",
-  "Oops! This shortcut took a wrong turn.",
-  "Link expired. Probably chasing squirrels.",
-  "404 Error: Link went on an adventure without you.",
-  "Thank you for locating me, but unfortunately your link is in another castle."
-];
+const errorCache = new Map();
+const CACHE_TTL = 3600;
 
-const funny401 = [
-  "Unauthorized! special access only.",
-  "Access denied. Only fluffy creatures allowed.",
-  "401: Not fluffy."
-];
+const errorPrompts = {
+  400: "Generate a witty 400 Bad Request error message with a fluffy/squirrel theme. Keep it under 60 characters. Playful and whimsical. Just the message, no explanation.",
+  401: "Generate a witty 401 Unauthorized error message with a fluffy/squirrel theme. Keep it under 60 characters. Playful and whimsical. Just the message, no explanation.",
+  404: "Generate a witty 404 Not Found error message with a fluffy/squirrel theme. Keep it under 60 characters. Playful and whimsical. Just the message, no explanation."
+};
 
-const funny400 = [
-  "Bad request. Did you forget the magic word?",
-  "400: Invalid data. URL required, fluff optional.",
-  "Missing something? Like your URL?",
-  "Bad JSON or missing fields. Try harder!"
-];
+async function generateAIErrorMessage(env, statusCode) {
+  const cacheKey = `error_${statusCode}`;
+  
+  const cached = errorCache.get(cacheKey);
+  if (cached && Date.now() < cached.expires) {
+    return cached.message;
+  }
 
-function randomMessage(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+  const response = await env.AI.run(
+    "@cf/meta/llama-3.1-8b-instruct-fast",
+    { prompt: errorPrompts[statusCode] }
+  );
+
+  const message = response.response?.trim() || response.trim();
+  
+  errorCache.set(cacheKey, {
+    message,
+    expires: Date.now() + (CACHE_TTL * 1000)
+  });
+
+  return message;
 }
 
 export default {
@@ -41,7 +47,7 @@ export default {
       if (request.method === 'POST' && url.pathname === '/l/c') {
       // Handle create short URL
       if (request.headers.get('X-Fluffy') !== 'true') {
-        return new Response(JSON.stringify({ error: 'Not fluffy enough', message: randomMessage(funny401) }), {
+        return new Response(JSON.stringify({ error: 'Not fluffy enough', message: await generateAIErrorMessage(env, 401) }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' }
         });
@@ -53,7 +59,7 @@ export default {
         const customSlug = body.slug;
 
         if (!originalUrl) {
-          return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+          return new Response(JSON.stringify({ error: 'Bad Request', message: await generateAIErrorMessage(env, 400) }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' }
           });
@@ -72,7 +78,7 @@ export default {
         });
 
       } catch (error) {
-        return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+        return new Response(JSON.stringify({ error: 'Bad Request', message: await generateAIErrorMessage(env, 400) }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
         });
@@ -81,7 +87,7 @@ export default {
     } else if (request.method === 'PUT' && url.pathname.startsWith('/l/')) {
       // Handle update short URL
       if (request.headers.get('X-Fluffy') !== 'true') {
-        return new Response(JSON.stringify({ error: 'Unauthorized', message: randomMessage(funny401) }), {
+        return new Response(JSON.stringify({ error: 'Unauthorized', message: await generateAIErrorMessage(env, 401) }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' }
         });
@@ -89,7 +95,7 @@ export default {
 
       const slug = url.pathname.split('/l/')[1];
       if (!slug) {
-        return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+        return new Response(JSON.stringify({ error: 'Bad Request', message: await generateAIErrorMessage(env, 400) }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
         });
@@ -100,7 +106,7 @@ export default {
         const newUrl = body.url;
 
         if (!newUrl) {
-          return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+          return new Response(JSON.stringify({ error: 'Bad Request', message: await generateAIErrorMessage(env, 400) }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' }
           });
@@ -109,7 +115,7 @@ export default {
         // Check if exists
         const existing = await env.URLS.get(slug);
         if (!existing) {
-          return new Response(JSON.stringify({ error: 'Not Found', message: randomMessage(funny404) }), {
+          return new Response(JSON.stringify({ error: 'Not Found', message: await generateAIErrorMessage(env, 404) }), {
             status: 404,
             headers: { 'Content-Type': 'application/json' }
           });
@@ -122,7 +128,7 @@ export default {
         });
 
       } catch (error) {
-        return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+        return new Response(JSON.stringify({ error: 'Bad Request', message: await generateAIErrorMessage(env, 400) }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
         });
@@ -131,7 +137,7 @@ export default {
     } else if (request.method === 'DELETE' && url.pathname.startsWith('/l/')) {
       // Handle delete short URL
       if (request.headers.get('X-Fluffy') !== 'true') {
-        return new Response(JSON.stringify({ error: 'Unauthorized', message: randomMessage(funny401) }), {
+        return new Response(JSON.stringify({ error: 'Unauthorized', message: await generateAIErrorMessage(env, 401) }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' }
         });
@@ -139,7 +145,7 @@ export default {
 
       const slug = url.pathname.split('/l/')[1];
       if (!slug) {
-        return new Response(JSON.stringify({ error: 'Bad Request', message: randomMessage(funny400) }), {
+        return new Response(JSON.stringify({ error: 'Bad Request', message: await generateAIErrorMessage(env, 400) }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
         });
@@ -147,7 +153,7 @@ export default {
 
       const existing = await env.URLS.get(slug);
       if (!existing) {
-        return new Response(JSON.stringify({ error: 'Not Found', message: randomMessage(funny404) }), {
+        return new Response(JSON.stringify({ error: 'Not Found', message: await generateAIErrorMessage(env, 404) }), {
           status: 404,
           headers: { 'Content-Type': 'application/json' }
         });
@@ -186,7 +192,7 @@ export default {
       });
 
     } else {
-      return new Response(JSON.stringify({ error: 'Not Found', message: randomMessage(funny404) }), {
+      return new Response(JSON.stringify({ error: 'Not Found', message: await generateAIErrorMessage(env, 404) }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -282,13 +288,13 @@ export default {
 
       const originalUrl = await env.URLS.get(shortCode);
       if (!originalUrl) {
-        return new Response(randomMessage(funny404), { status: 404 });
+        return new Response(await generateAIErrorMessage(env, 404), { status: 404 });
       }
 
       return Response.redirect(originalUrl, 302);
 
     } else {
-      return new Response(randomMessage(funny404), { status: 404 });
+      return new Response(await generateAIErrorMessage(env, 404), { status: 404 });
     }
     } else {
       return new Response('Domain not supported', { status: 404 });

@@ -6,5 +6,8 @@ compatibility_date = "2025-11-17"
 binding = "URLS"
 id = "f347d3d279254508b4f991bf0d0f3c19"
 
+[ai]
+binding = "AI"
+
 [version_metadata]
 binding = "CF_VERSION_METADATA"

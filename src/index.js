@@ -29,7 +29,7 @@ export default {
     const url = new URL(request.url);
     const hostname = url.hostname;
 
-    if (hostname === 'api.snubs.dev') {
+    if (hostname === 'api.snubs.dev' || hostname === "api.go-to.wtf") {
       // API domain - only allow management operations
       if (url.pathname === '/l/c' && request.method !== 'POST') {
         return new Response(JSON.stringify({ error: 'Method Not Allowed', message: 'Only POST requests are allowed for this endpoint' }), {

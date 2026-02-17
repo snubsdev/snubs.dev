@@ -163,7 +163,6 @@ export default {
         status: 'OK',
         urlCount: urlCount,
         versionId: versionId,
-        versionTag: versionTag,
         versionTimestamp: versionTimestamp
       };
       return new Response(JSON.stringify(health), {

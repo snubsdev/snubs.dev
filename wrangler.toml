@@ -7,4 +7,4 @@ binding = "URLS"
 id = "f347d3d279254508b4f991bf0d0f3c19"
 
 [version_metadata]
-binding = "VERSION_METADATA"
+binding = "CF_VERSION_METADATA"

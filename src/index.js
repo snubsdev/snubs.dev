@@ -162,8 +162,9 @@ export default {
         status: 'OK',
         timestamp: new Date().toISOString(),
         urlCount: urlCount,
-        versionId: env.VERSION_METADATA.versionId,
-        versionTag: env.VERSION_METADATA.versionTag
+        versionId: versionId,
+        versionTag: versionTag,
+        versionTimestamp: versionTimestamp
       };
       return new Response(JSON.stringify(health), {
         headers: { 'Content-Type': 'application/json' }

@@ -161,7 +161,6 @@ export default {
       const urlCount = keys.keys.length;
       const health = {
         status: 'OK',
-        timestamp: new Date().toISOString(),
         urlCount: urlCount,
         versionId: versionId,
         versionTag: versionTag,

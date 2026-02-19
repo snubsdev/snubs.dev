@@ -7,6 +7,62 @@ const errorPrompts = {
   404: "Generate a witty 404 Not Found error message with a fluffy/squirrel theme. Keep it under 60 characters. Playful and whimsical. Just the message, no explanation."
 };
 
+async function sendDiscordWebhook(env, action, slug, url, oldUrl = null) {
+  if (!env.DISCORD_WEBHOOK_URL) return;
+
+  const colors = {
+    create: 0x2ecc71,
+    update: 0xf39c12,
+    delete: 0xe74c3c
+  };
+
+  const actionVerbs = {
+    create: "Created",
+    update: "Updated",
+    delete: "Deleted"
+  };
+
+  const embed = {
+    embeds: [{
+      title: `${actionVerbs[action]} Short Link`,
+      color: colors[action],
+      fields: [
+        {
+          name: "Slug",
+          value: `\`${slug}\``,
+          inline: true
+        },
+        {
+          name: "URL",
+          value: url ? `[${new URL(url).hostname}](${url})` : "*deleted*",
+          inline: true
+        }
+      ],
+      timestamp: new Date().toISOString(),
+      footer: {
+        text: "Fluffy Links",
+        icon_url: "https://go-to.wtf/icon"
+      }
+    }]
+  };
+
+  if (oldUrl && action === "update") {
+    embed.embeds[0].fields.push({
+      name: "Old URL",
+      value: `[${new URL(oldUrl).hostname}](${oldUrl})`,
+      inline: false
+    });
+  }
+
+  try {
+    await fetch(env.DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(embed)
+    });
+  } catch (e) {}
+}
+
 async function generateAIErrorMessage(env, statusCode) {
   const cacheKey = `error_${statusCode}`;
   
@@ -71,6 +127,9 @@ export default {
         // Store in KV (overwrite if exists)
         await env.URLS.put(shortCode, originalUrl);
 
+        // Send Discord webhook
+        await sendDiscordWebhook(env, "create", shortCode, originalUrl);
+
         // Return the short URL
         const shortUrl = `https://snubs.dev/${shortCode}`;
         return new Response(JSON.stringify({ shortUrl }), {
@@ -123,6 +182,10 @@ export default {
 
         // Update
         await env.URLS.put(slug, newUrl);
+
+        // Send Discord webhook
+        await sendDiscordWebhook(env, "update", slug, newUrl, existing);
+
         return new Response(JSON.stringify({ shortUrl: `${url.origin}/${slug}` }), {
           headers: { 'Content-Type': 'application/json' }
         });
@@ -160,6 +223,10 @@ export default {
       }
 
       await env.URLS.delete(slug);
+
+      // Send Discord webhook
+      await sendDiscordWebhook(env, "delete", slug, existing);
+
       return new Response('Deleted', { status: 200 });
 
     } else if (request.method === 'GET' && url.pathname === '/health') {
